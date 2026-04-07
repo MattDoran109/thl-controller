@@ -1,0 +1,25 @@
+## idf_component.yml — Al Wall Controller
+## Managed component dependencies (fetched by idf-component-manager)
+
+dependencies:
+  idf: ">=5.1.0"
+
+  ## LVGL port for ESP32 (handles LVGL task, locking, display/touch registration)
+  espressif/esp_lvgl_port:
+    version: ">=2.3.0"
+
+  ## Touch controller driver for FT5x06 (built into WT32-SC01 PLUS)
+  espressif/esp_lcd_touch_ft5x06:
+    version: ">=1.0.3"
+
+  ## ST7796 LCD panel driver
+  espressif/esp_lcd_st7796:
+    version: ">=1.0.0"
+
+  ## mDNS — moved out of IDF core in v5.5, now a managed component
+  espressif/mdns:
+    version: ">=1.0.0"
+
+  ## cJSON — already bundled with ESP-IDF, listed here for clarity
+  ## (if idf version < 5.1 you may need to add it explicitly)
+  # idf-component-manager/cjson: ">=1.7.14"

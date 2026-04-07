@@ -1,0 +1,35 @@
+idf_component_register(
+    SRCS
+        "main.c"
+        "relay.c"
+        "mcp23017.c"
+        "sensor_manager.c"
+        "controller.c"
+        "light_pwm.c"
+        "web_server.c"
+        "display.c"
+        "sd_logger.c"
+        "wifi_manager.c"
+        "notifier.c"
+        "alert_manager.c"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        driver
+        esp_wifi
+        esp_event
+        nvs_flash
+        esp_http_server
+        esp_netif
+        mdns
+        json
+        esp_lvgl_port
+        esp_lcd
+        log
+        freertos
+        fatfs
+        sdmmc
+        spi_flash
+        esp_http_client
+        esp-tls
+)

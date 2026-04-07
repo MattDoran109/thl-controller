@@ -1,0 +1,17 @@
+/build/
+/managed_components/
+sdkconfig
+sdkconfig.old
+*.bin
+*.elf
+*.map
+*.drawio
+*.bkp
+bld.txt
+flash_log.txt
+build*.txt
+build_out.txt
+Wiring diagram.txt
+_local/
+
+

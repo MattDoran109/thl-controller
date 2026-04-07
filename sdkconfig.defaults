@@ -1,0 +1,71 @@
+# ============================================================
+# sdkconfig.defaults — Al Wall Controller (WT32-SC01 PLUS)
+# ============================================================
+
+# Target: ESP32-S3
+CONFIG_IDF_TARGET="esp32s3"
+
+# Flash / PSRAM
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_QUAD=y
+CONFIG_SPIRAM_SPEED_80M=y
+CONFIG_SPIRAM_BOOT_INIT=y
+
+# Partition table — custom for 8 MB flash (3 MB app partition)
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+
+# FreeRTOS
+CONFIG_FREERTOS_HZ=1000
+CONFIG_FREERTOS_UNICORE=n
+
+# Logging
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y
+
+# FatFS — enable LFN (heap mode) so filenames like 2026-03-09.csv are valid
+CONFIG_FATFS_LFN_HEAP=y
+
+# HTTP Server
+CONFIG_HTTPD_MAX_REQ_HDR_LEN=1024
+CONFIG_HTTPD_MAX_URI_LEN=512
+
+# WiFi
+CONFIG_ESP_WIFI_STATIC_RX_BUFFER_NUM=10
+CONFIG_ESP_WIFI_DYNAMIC_RX_BUFFER_NUM=32
+
+# NVS (stores WiFi creds, setpoints)
+CONFIG_NVS_ASSERT_ERROR_CHECK=n
+
+# LVGL — via esp_lvgl_port
+CONFIG_LV_MEM_SIZE_KILOBYTES=128
+CONFIG_LV_COLOR_DEPTH_16=y
+CONFIG_LV_FONT_MONTSERRAT_20=y
+CONFIG_LV_FONT_MONTSERRAT_28=y
+CONFIG_LV_FONT_MONTSERRAT_32=y
+
+# mDNS (allows 'http://controller.local' in browser)
+CONFIG_MDNS_MAX_SERVICES=5
+
+# LwIP — raise socket limit to handle httpd + mDNS + NTP concurrently.
+# Default of 10 is too low; accept() silently fails and the web UI freezes.
+CONFIG_LWIP_MAX_SOCKETS=16
+
+# LwIP TCP tuning
+# MSL=2000ms → TIME_WAIT=4s (not 120s). With Connection:close on every poll the 60-second
+# default exhausts all 16 sockets within ~80s, causing all new connections to fail.
+CONFIG_LWIP_TCP_MSL=2000
+# Larger SND/WND buffers reduce EAGAIN stalls when serving multi-KB HTML pages over WiFi.
+CONFIG_LWIP_TCP_SND_BUF_DEFAULT=11520
+CONFIG_LWIP_TCP_WND_DEFAULT=11520
+# Extra stack for the TCP/IP task (complex header processing needs >3072 bytes).
+CONFIG_LWIP_TCPIP_TASK_STACK_SIZE=4096
+
+# PSRAM — reserve enough internal DMA pool for concurrent WiFi/SPI/mDNS/lwIP.
+# 32 KB causes DMA OOM (sdmmc_read_sectors fails) when all subsystems compete.
+CONFIG_SPIRAM_MALLOC_RESERVE_INTERNAL=65536
+
+CONFIG_MBEDTLS_SSL_IN_CONTENT_LEN=4096
+CONFIG_MBEDTLS_DYNAMIC_BUFFER=y
+CONFIG_MBEDTLS_SSL_VARIABLE_BUFFER_LENGTH=y
+CONFIG_SPIRAM_MALLOC_ALWAYSINTERNAL=1024
