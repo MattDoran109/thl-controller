@@ -80,9 +80,11 @@ static void nvs_load(void)
     if (nvs_get_i8(h, "light_off_m",  &ib) == ESP_OK) s_sp.light_off_min  = ib;
 
     uint8_t ub2;
-    if (nvs_get_u8(h, "light_rise_m", &ub2) == ESP_OK) s_sp.light_sunrise_min = ub2;
-    if (nvs_get_u8(h, "light_set_m",  &ub2) == ESP_OK) s_sp.light_sunset_min  = ub2;
-    if (nvs_get_u8(h, "light_col",    &ub2) == ESP_OK) s_sp.light_colour_temp = ub2;
+    if (nvs_get_u8(h, "light_rise_m", &ub2) == ESP_OK) s_sp.light_sunrise_min   = ub2;
+    if (nvs_get_u8(h, "light_set_m",  &ub2) == ESP_OK) s_sp.light_sunset_min    = ub2;
+    if (nvs_get_u8(h, "light_col",    &ub2) == ESP_OK) s_sp.light_colour_temp   = ub2;
+    if (nvs_get_u8(h, "light_sched_en",&ub) == ESP_OK) s_sp.light_schedule_enabled = (bool)ub;
+    if (nvs_get_u8(h, "light_max_br", &ub2) == ESP_OK) s_sp.light_max_brightness = ub2;
 
     uint32_t v32r;
 #define NVS_GET_FLOAT2(key, field) \
@@ -117,9 +119,11 @@ static void nvs_save(void)
     nvs_set_i8(h,  "light_on_m",  (int8_t)s_sp.light_on_min);
     nvs_set_i8(h,  "light_off",   (int8_t)s_sp.light_off_hour);
     nvs_set_i8(h,  "light_off_m", (int8_t)s_sp.light_off_min);
-    nvs_set_u8(h,  "light_rise_m", (uint8_t)s_sp.light_sunrise_min);
-    nvs_set_u8(h,  "light_set_m",  (uint8_t)s_sp.light_sunset_min);
-    nvs_set_u8(h,  "light_col",    s_sp.light_colour_temp);
+    nvs_set_u8(h,  "light_rise_m",  (uint8_t)s_sp.light_sunrise_min);
+    nvs_set_u8(h,  "light_set_m",   (uint8_t)s_sp.light_sunset_min);
+    nvs_set_u8(h,  "light_col",     s_sp.light_colour_temp);
+    nvs_set_u8(h,  "light_sched_en",(uint8_t)s_sp.light_schedule_enabled);
+    nvs_set_u8(h,  "light_max_br",  s_sp.light_max_brightness);
 
     NVS_SET_FLOAT("pfan_max",  panel_temp_max_c);
     NVS_SET_FLOAT("pfan_hyst", panel_temp_hyst_c);
@@ -202,6 +206,7 @@ esp_err_t controller_init(void)
     s_sp.light_schedule_enabled  = true;
     s_sp.light_sunrise_min       = DEFAULT_LIGHT_SUNRISE_MIN;
     s_sp.light_sunset_min        = DEFAULT_LIGHT_SUNSET_MIN;
+    s_sp.light_max_brightness    = DEFAULT_LIGHT_MAX_BRIGHTNESS;
     s_sp.panel_temp_max_c        = DEFAULT_PANEL_TEMP_MAX_C;
     s_sp.panel_temp_hyst_c       = DEFAULT_PANEL_TEMP_HYST_C;
 
@@ -416,6 +421,7 @@ void controller_run_cycle(void)
         bool use_ramps = (ramp_total > 0) && (window_min >= ramp_total * 4);
         int eff_sunrise = use_ramps ? sp.light_sunrise_min : 0;
         int eff_sunset  = use_ramps ? sp.light_sunset_min  : 0;
+        uint8_t max_br  = sp.light_max_brightness ? sp.light_max_brightness : 100;
 
         if (s_manual[RELAY_LIGHT]) {
             // Manual override active — sunrise/sunset not running.
@@ -426,7 +432,7 @@ void controller_run_cycle(void)
             s_light_falling = false;
             relay_set(RELAY_LIGHT, true);
             if (eff_sunrise <= 0) {
-                light_pwm_set_all(100);
+                light_pwm_set_all(max_br);
                 ESP_LOGI(TAG, "Light ON (instant, aborted sunset)");
             } else {
                 s_light_rising = true;
@@ -441,7 +447,7 @@ void controller_run_cycle(void)
             relay_set(RELAY_LIGHT, true);
             s_light_falling = false;
             if (eff_sunrise <= 0) {
-                light_pwm_set_all(100);
+                light_pwm_set_all(max_br);
                 s_light_rising = false;
                 ESP_LOGI(TAG, "Light ON (instant)");
             } else {
@@ -470,11 +476,11 @@ void controller_run_cycle(void)
             // Sunrise ramp in progress.
             int elapsed_min = (int)((now_t - s_light_transition_start) / 60);
             if (elapsed_min >= eff_sunrise) {
-                light_pwm_set_all(100);
+                light_pwm_set_all(max_br);
                 s_light_rising = false;
                 ESP_LOGI(TAG, "Sunrise complete");
             } else {
-                uint8_t pct = (uint8_t)(elapsed_min * 100 / eff_sunrise);
+                uint8_t pct = (uint8_t)(elapsed_min * max_br / eff_sunrise);
                 light_pwm_set_all(pct < 1 ? 1 : pct);
             }
 
@@ -487,7 +493,7 @@ void controller_run_cycle(void)
                 s_light_falling = false;
                 ESP_LOGI(TAG, "Sunset complete");
             } else {
-                uint8_t pct = (uint8_t)(100 - elapsed_min * 100 / eff_sunset);
+                uint8_t pct = (uint8_t)(max_br - elapsed_min * max_br / eff_sunset);
                 light_pwm_set_all(pct);
             }
         }

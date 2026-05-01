@@ -174,6 +174,7 @@
 // Sunrise/sunset ramp durations in minutes.  Set to 0 for instant on/off.
 #define DEFAULT_LIGHT_SUNRISE_MIN  30
 #define DEFAULT_LIGHT_SUNSET_MIN   30
+#define DEFAULT_LIGHT_MAX_BRIGHTNESS 100   // % — schedule target brightness
 
 // ------------------------------------------------------------
 // Default environmental setpoints

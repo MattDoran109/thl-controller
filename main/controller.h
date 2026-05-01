@@ -29,6 +29,7 @@ typedef struct {
     int      light_sunrise_min;   // 0 = instant on,  >0 = ramp over N minutes
     int      light_sunset_min;    // 0 = instant off, >0 = ramp over N minutes
     uint8_t  light_colour_temp;   // 0=Cool/100kHz  1=Neutral/65kHz  2=Warm/40kHz
+    uint8_t  light_max_brightness;// 0-100 % — schedule on/ramp target brightness
     float    panel_temp_max_c;    // Cabinet fan turns ON above this
     float    panel_temp_hyst_c;   // Cabinet fan turns OFF below (max - hyst)
 } controller_setpoints_t;

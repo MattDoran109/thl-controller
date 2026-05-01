@@ -41,7 +41,7 @@ static const char HTML_TEST[] =
 "<!DOCTYPE html><html lang='en'><head>"
 "<meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
 "<link rel='icon' type='image/png' href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAACfUlEQVR4AeyUbUhTYRTH/89cdW9GC4wINMKwwOyTixRMEoJilZAwhEAQY1MosXatjCJUpMh0W4aVeY0ShCAEP/Qy6tPCgoy5jwUl0YuBRJ8Mt1uxnc4iYbi7tc2gkHu5f87zcp5zfvd/4THhHz8GgOGA4YDhwP/pAPVihHpwjWMXedDMqqFLKKUrWP23L059B0xog0A/onjMmgFhI8/r8QN3GOoWy8VAu6gD0mKBdAGEgk/iBF6KUxjnOCpacVmcxDGO+xnoAoCPyIENq/CQYTrZrSq6yyu8kemrC5CqCEO9+Q11GoRqzn3O7tjwAT6G6fr1uzwo4vW03owB4quyK3MM42O1YTnsDOJnhzaxzpIbjxjoBsd21tH4c/HjRIDxiS14GqhPW88mnbFcURqoEWWBAlEe+MLyr7H6R3cU335XXeReWVfYVYzxyQPxjefHiQDzO4uOFiBSQfTdTpHw4aTVEgEqy15j5/bhtFVhVWO5I0Hr2NBEybT6YtvawYmSKnew2N44VVB4cHpdePfnvFeotN7Xo0gE0MtKstbTM5N706vZBt1adziijUKgiiDemoQ471CkvU5FbnK65E6nS7qapAQyBhjo0zar3pB9yKNdtORY7kWIyoWJfJZ8yeZQ5HONyooxhyJNJWu4cF0X4LonlD/Q+3Wr6glXqt5vdtWtHVfdoT7Voz0wR+mMINOGKMi3bFba16jI7U6X7K+tFZGFxdOZ6wKYSXTnCHOzAPYIovUkxPuoiYbD5rlDDpfcwF/o5cZPGjqElk6TVDm6AM5WuY51xMGWOhSpP2Zrkys32NKSN5uqWDZ7ugDZFMr2jAFgOGA4sPQd+NP98BMAAP//Dttx7gAAAAZJREFUAwAno/lBlBw0IgAAAABJRU5ErkJggg=='>"
-"<title>Test &mdash; Al Wall Controller</title>"
+"<title>Test &mdash; THL Controller</title>"
 "<style>"
 "*{box-sizing:border-box}"
 "body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;margin:0;padding:14px}"
@@ -158,7 +158,7 @@ static const char HTML_DASHBOARD[] =
 "<html lang='en'><head>"
 "<meta charset='UTF-8'>"
 "<meta name='viewport' content='width=device-width,initial-scale=1'>"
-"<title>Al Wall Controller</title>"
+"<title>THL Controller</title>"
 "<style>"
 "*{box-sizing:border-box}"
 "body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;margin:0;padding:14px}"
@@ -217,7 +217,7 @@ static const char HTML_DASHBOARD[] =
 
 "<div id='testbanner'>&#9888; TEST MODE ACTIVE &mdash; schedules suspended</div>"
 "<div class='topbar'>"
-"<h1>&#127807; Al Wall Controller</h1>"
+"<h1>&#127807; THL Controller</h1>"
 "<div class='right'><a href='/charts' style='color:#888;text-decoration:none;margin-right:10px'>&#128200;</a><a href='/logs' style='color:#888;text-decoration:none;margin-right:10px'>&#x2699;</a><a href='/test' style='color:#888;text-decoration:none;margin-right:10px'>&#128295;</a><span id='devtime'>--:--</span> &bull; <span id='sdst' title='SD card'>SD:?</span> &bull; <span id='door' style='display:none;color:#f59e0b;font-weight:bold'>DOOR OPEN</span><span id='door-sep' style='display:none'> &bull; </span><span id='health'>...</span></div>"
 "</div>"
 
@@ -330,9 +330,11 @@ static const char HTML_DASHBOARD[] =
 "+\"<div class='sec'><h4>Schedule</h4><div class='sp-row'>\""
 "+\"<div class='sp-item'><label>ON time</label><input class='sp' type='text' id='sp_lon' placeholder='HH:MM' maxlength='5'></div>\""
 "+\"<div class='sp-item'><label>OFF time</label><input class='sp' type='text' id='sp_loff' placeholder='HH:MM' maxlength='5'></div>\""
-"+\"</div></div>\""
-"+\"<div class='sec'><h4>Ramp (min, 0&nbsp;=&nbsp;instant)</h4><div class='sp-row'>\""
-"+spCtrl('sp_rise',5,'Sunrise (min)')+spCtrl('sp_set_m',5,'Sunset (min)')"
+"+\"</div>\""
+"+\"<div class='tog'><label style='margin-right:8px'>Schedule enabled</label>\""
+"+\"<input type='checkbox' id='sp_lsched_en'></div></div>\""
+"+\"<div class='sec'><h4>Brightness &amp; Ramp</h4><div class='sp-row'>\""
+"+spCtrl('sp_lbright',5,'Max brightness (%)')+spCtrl('sp_rise',5,'Sunrise (min)')+spCtrl('sp_set_m',5,'Sunset (min)')"
 "+\"</div></div>\""
 "+\"<div class='sec'><h4>Colour Temperature</h4>\""
 "+\"<div class='tog'>\""
@@ -355,6 +357,8 @@ static const char HTML_DASHBOARD[] =
 "document.getElementById('sp_fan_en').checked=sp.fan_sched_enabled;}"
 "else if(id===3){document.getElementById('sp_lon').value=p2(sp.light_on_hour)+':'+p2(sp.light_on_min);"
 "document.getElementById('sp_loff').value=p2(sp.light_off_hour)+':'+p2(sp.light_off_min);"
+"document.getElementById('sp_lsched_en').checked=sp.light_schedule_enabled!==false;"
+"document.getElementById('sp_lbright').value=sp.light_max_brightness!=null?sp.light_max_brightness:100;"
 "document.getElementById('sp_rise').value=sp.light_sunrise_min!=null?sp.light_sunrise_min:0;"
 "document.getElementById('sp_set_m').value=sp.light_sunset_min!=null?sp.light_sunset_min:0;"
 "selCT(sp.light_colour_temp!=null?sp.light_colour_temp:0);}}"
@@ -400,6 +404,8 @@ static const char HTML_DASHBOARD[] =
 "const loff=document.getElementById('sp_loff').value.split(':');"
 "sp.light_on_hour=parseInt(lon[0])||0;sp.light_on_min=parseInt(lon[1])||0;"
 "sp.light_off_hour=parseInt(loff[0])||0;sp.light_off_min=parseInt(loff[1])||0;"
+"sp.light_schedule_enabled=document.getElementById('sp_lsched_en').checked;"
+"sp.light_max_brightness=Math.min(100,Math.max(0,parseInt(document.getElementById('sp_lbright').value)||100));"
 "sp.light_sunrise_min=parseInt(document.getElementById('sp_rise').value)||0;"
 "sp.light_sunset_min=parseInt(document.getElementById('sp_set_m').value)||0;"
 "var ctact=[0,1,2].findIndex(function(i){var b=document.getElementById('ctb'+i);return b&&b.classList.contains('act');});"
@@ -420,7 +426,7 @@ static const char HTML_DASHBOARD[] =
 static const char HTML_LOGS[] =
 "<!DOCTYPE html><html lang='en'><head>"
 "<meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'>"
-"<title>Settings &amp; Logs &mdash; Al Wall Controller</title>"
+"<title>Settings &amp; Logs &mdash; THL Controller</title>"
 "<style>"
 "*{box-sizing:border-box}"
 "body{font-family:Arial,sans-serif;background:#1a1a2e;color:#eee;margin:0;padding:14px}"
@@ -968,9 +974,12 @@ static esp_err_t handler_api_status(httpd_req_t *req)
     cJSON_AddNumberToObject(sps, "light_on_min",       sp.light_on_min);
     cJSON_AddNumberToObject(sps, "light_off_hour",     sp.light_off_hour);
     cJSON_AddNumberToObject(sps, "light_off_min",      sp.light_off_min);
-    cJSON_AddNumberToObject(sps, "light_sunrise_min",  sp.light_sunrise_min);
-    cJSON_AddNumberToObject(sps, "light_sunset_min",   sp.light_sunset_min);
-    cJSON_AddNumberToObject(sps, "panel_temp_max_c",   (double)sp.panel_temp_max_c);
+    cJSON_AddNumberToObject(sps, "light_sunrise_min",    sp.light_sunrise_min);
+    cJSON_AddNumberToObject(sps, "light_sunset_min",     sp.light_sunset_min);
+    cJSON_AddNumberToObject(sps, "light_colour_temp",    sp.light_colour_temp);
+    cJSON_AddBoolToObject(sps,   "light_schedule_enabled", sp.light_schedule_enabled);
+    cJSON_AddNumberToObject(sps, "light_max_brightness", sp.light_max_brightness);
+    cJSON_AddNumberToObject(sps, "panel_temp_max_c",     (double)sp.panel_temp_max_c);
     cJSON_AddNumberToObject(sps, "panel_temp_hyst_c",  (double)sp.panel_temp_hyst_c);
 
     cJSON_AddBoolToObject(root, "test_mode", controller_get_test_mode());
@@ -1049,9 +1058,13 @@ static esp_err_t handler_api_setpoints(httpd_req_t *req)
     JSON_GET_INT("light_on_min",        light_on_min)
     JSON_GET_INT("light_off_hour",      light_off_hour)
     JSON_GET_INT("light_off_min",       light_off_min)
-    JSON_GET_INT("light_colour_temp",   light_colour_temp)
-    JSON_GET_INT("light_sunrise_min",   light_sunrise_min)
-    JSON_GET_INT("light_sunset_min",    light_sunset_min)
+    JSON_GET_INT("light_colour_temp",     light_colour_temp)
+    JSON_GET_INT("light_sunrise_min",     light_sunrise_min)
+    JSON_GET_INT("light_sunset_min",      light_sunset_min)
+    { cJSON *item = cJSON_GetObjectItem(json, "light_schedule_enabled");
+      if (item && cJSON_IsBool(item)) sp.light_schedule_enabled = cJSON_IsTrue(item); }
+    { cJSON *item = cJSON_GetObjectItem(json, "light_max_brightness");
+      if (item && cJSON_IsNumber(item)) { int v = item->valueint; sp.light_max_brightness = (uint8_t)(v < 0 ? 0 : v > 100 ? 100 : v); } }
     JSON_GET_FLOAT("panel_temp_max_c",  panel_temp_max_c)
     JSON_GET_FLOAT("panel_temp_hyst_c", panel_temp_hyst_c)
 
@@ -1414,7 +1427,7 @@ static esp_err_t handler_api_notifier_test(httpd_req_t *req)
 
     // Fire-and-forget: TLS POST runs in a one-shot background task so the
     // httpd task is never blocked (blocking here causes EAGAIN on all pages).
-    notifier_send("Al Wall Controller",
+    notifier_send("THL Controller",
                   "Test notification — your controller is connected!");
     httpd_resp_set_type(req, "application/json");
     httpd_resp_set_hdr(req, "Connection", "close");
@@ -1624,7 +1637,7 @@ static esp_err_t handler_charts(httpd_req_t *req)
         "<!DOCTYPE html><html lang='en'><head>"
         "<meta charset='UTF-8'>"
         "<meta name='viewport' content='width=device-width,initial-scale=1'>"
-        "<title>Charts \u2014 Al Wall Controller</title>"
+        "<title>Charts \u2014 THL Controller</title>"
         "<script src='https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js'></script>"
         "<style>"
         "*{box-sizing:border-box}"
